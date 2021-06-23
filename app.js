@@ -19,14 +19,7 @@ app.use((req, res, next) => {
 });
 
 // Custom error handlers.
-function tweetNotFound(tweetId) {
-  const error = new Error(`Tweet ${ tweetId } not found`);
 
-  error.title = 'Tweet not found';
-  error.status = 404;
-
-  return error;
-}
 
 
 // Generic error handler.
@@ -35,6 +28,7 @@ app.use((err, req, res, next) => {
   const isProduction = environment === "production";
   res.json({
     title: err.title || "Server Error",
+    errors: err.errors,
     message: err.message,
     stack: isProduction ? null : err.stack,
   });
