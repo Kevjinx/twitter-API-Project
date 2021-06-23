@@ -59,11 +59,58 @@ router.get("/tweets/:id(\\d+)", asyncHandler(async(req, res, next) => {
     }
 }));
 
-router.post('/tweets',tweetValidations, handleValidationErrors, asyncHandler(async (req, res,) => {
+router.post('/tweets', tweetValidations, handleValidationErrors, asyncHandler(async (req, res,) => {
 
   const tweet = req.body.message
   res.json(tweet)
 }))
 
+router.put('/tweets/:id(\\d+)', tweetValidations, handleValidationErrors, asyncHandler(async(req, res) => {
+    const tweetId = req.params.id;
+
+    const testTweet = await Tweet.findByPk(tweetId);
+
+    if(!testTweet) {
+      next(tweetNotFoundError(tweetId))
+    } else {
+      const tweet = await Tweet.update({
+          message: req.body.message
+      }, {where: { id: tweetId }})
+
+      //res.json({ tweet })
+      res.redirect(`/tweets/${tweetId}`);
+    }
+
+
+    //console.log(tweet);
+
+    //tweet.message = "Test Message";
+
+    //console.log(tweet);
+
+    //await tweet.reload();
+
+    // console.log("Here is our test!");
+
+
+}))
+
+router.delete('/tweets/:id(\\d+)', tweetValidations, asyncHandler(async(req, res) => {
+  const tweetId = req.params.id;
+
+  const testTweet = await Tweet.findByPk(tweetId);
+
+  if(!testTweet) {
+    next(tweetNotFoundError(tweetId))
+  } else {
+    const tweet = await Tweet.destroy({
+      where: {
+        id: tweetId
+      }
+    })
+    res.status(204).end()
+  }
+
+}));
 
 module.exports = router
